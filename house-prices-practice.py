@@ -14,7 +14,7 @@
 
 
 
-# In[2]:
+# In[37]:
 
 
 import pandas as pd
@@ -29,19 +29,19 @@ warnings.filterwarnings('ignore')
 get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-# In[3]:
+# In[38]:
 
 
 df_train = pd.read_csv('/Users/chrisoh/Desktop/kaggle/house-prices-advanced-regression-techniques/train.csv')
 
 
-# In[4]:
+# In[39]:
 
 
 df_train.columns
 
 
-# In[5]:
+# In[40]:
 
 
 df_train
@@ -76,7 +76,7 @@ df_train
 # 
 # Getting know about 'SalePrice'
 
-# In[6]:
+# In[41]:
 
 
 df_train['SalePrice'].describe()
@@ -84,7 +84,7 @@ df_train['SalePrice'].describe()
 
 # Good - minimum price is larger than zero.
 
-# In[7]:
+# In[42]:
 
 
 #histogram
@@ -95,7 +95,7 @@ sns.distplot(df_train['SalePrice'])
 # * Have appreciable postive skewness.
 # * Show peakedness
 
-# In[8]:
+# In[43]:
 
 
 #skewness and kurtosis
@@ -105,7 +105,7 @@ print("Kurtosis: %f" % df_train['SalePrice'].kurt())
 
 # ### Relationship with numerical variables
 
-# In[9]:
+# In[44]:
 
 
 #scatter plot grlivarea/saleprice
@@ -118,7 +118,7 @@ data.plot.scatter(x=var, y='SalePrice', ylim=(0,800000))
 
 # **Linear Relationship** can be seen in here.
 
-# In[10]:
+# In[45]:
 
 
 #scatter plot totalbsmtsf/saleprice
@@ -131,7 +131,7 @@ data.plot.scatter(x=var, y='SalePrice', ylim=(0,800000))
 
 # ### Relationship with categorical features
 
-# In[11]:
+# In[46]:
 
 
 #box plot overallqual/saleprice
@@ -144,7 +144,7 @@ fig.axis(ymin=0, ymax=800000)
 
 # Evident
 
-# In[12]:
+# In[47]:
 
 
 var = 'YearBuilt'
@@ -176,7 +176,13 @@ plt.xticks(rotation=90);
 
 # ### Correlation matrix (heatmap style)
 
-# In[13]:
+# In[48]:
+
+
+df_train.corr()
+
+
+# In[49]:
 
 
 #correlation matrix
@@ -187,13 +193,20 @@ sns.heatmap(corrmat, vmax=.8, square=True)
 
 # Best for the quick overview
 # 
-# At first sight, two red colored squares can be seen. The first one refers to the 'TotalBsmtSF' and '1stFlrSF' variables. and the second one refers to the 'GarageX' variables. Correlations of both cases are so strong that it can indicate a situation of multicollinearity. If we think about these variables, we can conclude that they give almost the same information so multicollinearity actually occurs. Heatmaps are great to find this kind of situations and in problems dominated by feature selection.
+# At first sight, two red(white?) colored squares can be seen. The first one refers to the 'TotalBsmtSF' and '1stFlrSF' variables. and the second one refers to the 'GarageX' variables. Correlations of both cases are so strong that it can indicate a situation of multicollinearity. If we think about these variables, we can conclude that they give almost the same information so multicollinearity(다중공선성) actually occurs. Heatmaps are great to find this kind of situations and in problems dominated by feature selection.
 # 
 # Another attention was 'SalePrice' correlations. 'GrLivArea', 'TotalBsmtSF', and 'OverallQual' our well-known factors can be seen. But also many other variables should be taken into account.
 
 # ### 'SalePrice'correlation matrix (zoomed heatmap style)
 
-# In[14]:
+# In[50]:
+
+
+#show top 10 'SalePrice' from corrmat
+corrmat.nlargest(10, 'SalePrice')
+
+
+# In[51]:
 
 
 #saleprice correlation matrix
@@ -205,6 +218,8 @@ hm = sns.heatmap(cm, cbar=True, annot=True, square=True, fmt='.2f', annot_kws={'
                  xticklabels=cols.values)
 plt.show()
 
+
+# nlargest(pandas) -> 값이 높은 n번째까지 출력
 
 # reference https://hong-yp-ml-records.tistory.com/33
 
@@ -219,7 +234,7 @@ plt.show()
 
 # ### Scatter plots between 'SalePrice' and correlated variables
 
-# In[15]:
+# In[52]:
 
 
 #scatterplot
@@ -248,7 +263,7 @@ plt.show();
 # 
 # It is important to ensure that the missing data process is not biased and hiding other truths
 
-# In[16]:
+# In[53]:
 
 
 #missing data
@@ -272,7 +287,7 @@ missing_data.head(20)
 # 
 # In summary, to handle missing data, we'll delete all the variables with missing data, except the variable 'Electrical'. In 'Electrical' we'll just delete the observation with missing data.
 
-# In[17]:
+# In[54]:
 
 
 #dealing with missing data
@@ -297,7 +312,7 @@ df_train.isnull().sum().max()
 
 # argsort-작은값부터 순서대로 데이터의 위치를 반환
 
-# In[18]:
+# In[55]:
 
 
 #standardizing data
@@ -317,7 +332,7 @@ print(high_range)
 
 # ## Bivariate analysis (이변량분석)
 
-# In[19]:
+# In[56]:
 
 
 #bivariate analysis saleprice/grlivarea
@@ -329,7 +344,7 @@ data.plot.scatter(x=var, y='SalePrice', ylim=(0,800000))
 # * The two values with bigger 'GrLivArea' can be defined as a outliers and delete them
 # * The two observations in the top of the pot are those 7.smth observations that we said we should be careful about. Although they look like special cases, they seem to be following jthe trend. So, we keep them.
 
-# In[20]:
+# In[57]:
 
 
 #deleting points
@@ -338,7 +353,7 @@ df_train = df_train.drop(df_train[df_train['Id'] == 1299].index)
 df_train = df_train.drop(df_train[df_train['Id'] == 524].index)
 
 
-# In[21]:
+# In[58]:
 
 
 #bivariate analysis saleprice/grlivarea
@@ -370,7 +385,7 @@ data.plot.scatter(x=var, y='SalePrice', ylim=(0,800000))
 # * Histogram - kurtosis and skewness.
 # * Normal probability plot = Data distribution should closely follow the diagonal that represents the normal distribution.
 
-# In[22]:
+# In[59]:
 
 
 #histogram and normal probability plot
@@ -383,14 +398,14 @@ res = stats.probplot(df_train['SalePrice'], plot=plt)
 # 
 # A simple data transformation can solve this problem. In case of postive skewness, log transformation usually works well.
 
-# In[23]:
+# In[60]:
 
 
 #applying log transformation
 df_train['SalePrice'] = np.log(df_train['SalePrice'])
 
 
-# In[24]:
+# In[61]:
 
 
 #transformed histogram and normal probability plot
@@ -401,7 +416,7 @@ res = stats.probplot(df_train['SalePrice'], plot=plt)
 
 # Great, next is 'GrLivArea'
 
-# In[25]:
+# In[62]:
 
 
 #histogram and normal probability plot
@@ -410,14 +425,14 @@ fig = plt.figure()
 res = stats.probplot(df_train['GrLivArea'], plot=plt)
 
 
-# In[26]:
+# In[63]:
 
 
 #data transformation
 df_train['GrLivArea'] = np.log(df_train['GrLivArea'])
 
 
-# In[27]:
+# In[64]:
 
 
 sns.distplot(df_train['GrLivArea'], fit=norm)
@@ -425,7 +440,7 @@ fig = plt.figure()
 res = stats.probplot(df_train['GrLivArea'], plot=plt)
 
 
-# In[28]:
+# In[65]:
 
 
 #histogram and normal probability plot
@@ -440,7 +455,7 @@ res = stats.probplot(df_train['TotalBsmtSF'], plot=plt)
 # 
 # To apply a log transformation here, we will create a variable that can get the effect of having or not having basement (binary variable). Then, do a log transformation to all the non-zero observations, ignoring those with zero value. This way we can transform data, without loosing the effect of having or not basement.
 
-# In[29]:
+# In[66]:
 
 
 #create column for new variable (one is enough it's a binary categorical feature)
@@ -450,14 +465,14 @@ df_train['HasBsmt'] = 0
 df_train.loc[df_train['TotalBsmtSF']>0, 'HasBsmt'] = 1
 
 
-# In[30]:
+# In[67]:
 
 
 #transform data
 df_train.loc[df_train['HasBsmt']==1, 'TotalBsmtSF'] = np.log(df_train['TotalBsmtSF'])
 
 
-# In[31]:
+# In[68]:
 
 
 #histogram and normal probability plot
@@ -472,7 +487,7 @@ res = stats.probplot(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], plot=pl
 # 
 # Starting by 'SalePrice' and 'GrLivArea'...
 
-# In[32]:
+# In[69]:
 
 
 #scatter plot
@@ -483,7 +498,7 @@ plt.scatter(df_train['GrLivArea'], df_train['SalePrice'])
 # 
 # Now let's check 'SalePrice' with 'TotalBsmtSF'.
 
-# In[33]:
+# In[70]:
 
 
 #scatter plot
@@ -495,7 +510,7 @@ plt.scatter(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], df_train[df_trai
 
 # # Last but not the least, dummy variables
 
-# In[34]:
+# In[71]:
 
 
 #convert categorical variable into dummy
